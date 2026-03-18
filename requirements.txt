@@ -1,10 +1,6 @@
 streamlit
 pandas
-numpy
 plotly
 requests
 beautifulsoup4
-pytz
 streamlit-autorefresh
-tvdatafeed
-websocket-client
