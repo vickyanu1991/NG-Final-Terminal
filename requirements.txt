@@ -7,5 +7,5 @@ requests
 beautifulsoup4
 pytz
 streamlit-autorefresh
-tvdatafeed
+tradingview-datafeed
 websocket-client
