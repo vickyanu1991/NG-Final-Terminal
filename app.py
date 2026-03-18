@@ -54,26 +54,30 @@ def fetch_live_price_safe():
         return "Syncing...", f"Conn Err: {str(e)[:15]}", pd.DataFrame()
 
 def fetch_eia_inventory():
-    """Scrapes EIA using safe word-matching, not hardcoded positions."""
+    """Aggressive EIA Scraper that hunts for the number."""
     url = "https://ir.eia.gov/ngs/ngs.html"
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'}
     try:
         res = requests.get(url, headers=headers, timeout=10)
         soup = BeautifulSoup(res.text, 'html.parser')
         
-        table = soup.find('table')
-        if table:
-            for row in table.find_all('tr'):
-                if "Net Change" in row.text or "Implied Flow" in row.text:
-                    cols = row.find_all('td')
-                    if len(cols) > 1:
-                        val = cols[1].text.strip()
-                        score = 1 if "-" in val else -1
-                        return f"{val} Bcf", score
-        return "Format Changed", 0
+        # Hunt through all table cells
+        tds = soup.find_all('td')
+        for i, td in enumerate(tds):
+            text = td.text.strip()
+            if text == "Net Change" or text == "Implied Flow":
+                # Grab the number right next to it
+                val = tds[i+1].text.strip()
+                if val == "": # Sometimes the EIA leaves a blank gap
+                    val = tds[i+2].text.strip()
+                
+                score = 1 if "-" in val else -1
+                return f"{val} Bcf", score
+                
+        return "Awaiting Release", 0
     except Exception as e:
         return f"Err: {str(e)[:10]}", 0
-
+        
 def fetch_weather_trend():
     """Standard Open-Meteo fetch."""
     url = "https://api.open-meteo.com/v1/forecast?latitude=41.20&longitude=-77.19&daily=temperature_2m_max&forecast_days=14"
