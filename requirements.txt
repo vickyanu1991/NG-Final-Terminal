@@ -7,4 +7,4 @@ requests
 beautifulsoup4
 pytz
 streamlit-autorefresh
-https://github.com/TradeVSA/tvDatafeed/archive/refs/heads/master.zip
+tradingview-datafeed
